@@ -12,7 +12,7 @@ That's where you come in! Help them finish the trivia app so they can start hold
 4. Search for questions based on a text query string.
 5. Play the quiz game, randomizing either all questions or within a specific category.
 
-Completing this trivia app will give you the ability to structure plan, implement, and test an API - skills essential for enabling your future applications to communicate with others.
+Please contribute to the trivia app and make it better.
 
 ## Starting and Submitting the Project
 
@@ -20,7 +20,7 @@ Completing this trivia app will give you the ability to structure plan, implemen
 
 ## About the Stack
 
-We started the full stack application for you. It is designed with some key functional areas:
+The application is designed with some key functional areas:
 
 ### Backend
 
@@ -38,7 +38,7 @@ The [frontend](./frontend/README.md) directory contains a complete React fronten
 1. What are the end points and HTTP methods the frontend is expecting to consume?
 2. How are the requests from the frontend formatted? Are they expecting certain parameters or payloads?
 
-Pay special attention to what data the frontend is expecting from each API response to help guide how you format your API. The places where you may change the frontend behavior, and where you should be looking for the above information, are marked with `TODO`. These are the files you'd want to edit in the frontend:
+Pay special attention to what data the frontend is expecting from each API response to help guide how you format your API. These are the files you'd want to improve in the frontend:
 
 1. `frontend/src/components/QuestionView.js`
 2. `frontend/src/components/FormView.js`
@@ -47,3 +47,13 @@ Pay special attention to what data the frontend is expecting from each API respo
 By making notes ahead of time, you will practice the core skill of being able to read and understand code and will have a simple plan to follow to build out the endpoints of your backend API.
 
 > View the [Frontend README](./frontend/README.md) for more details.
+
+
+## API Documentation
+The API documentation is provided in the [API Documentation](./backend/README.md/#api-documentation) section of the backend README file.
+
+
+## Authors
+The project was forked from Udacity Trivia project repo as a project template for the Full Stack Web Developer Nanodegree exercise 2.
+
+I, [Rodrick](https://rodricksresume.gatsbyjs.io/) made a few updates on the backend and frontend, the documentation, handled the testing and the endpoints.
