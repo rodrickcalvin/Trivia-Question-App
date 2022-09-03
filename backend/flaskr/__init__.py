@@ -35,10 +35,11 @@ def create_app(test_config=None):
         '/categories' handles GET requests for all available trivia question categories.
         """
         categories = Category.query.order_by(Category.id).all()
-        formatted_categories = [category.format() for category in categories]
+        categories_object = {category.id: category.type for category in categories}
+        
         return jsonify({
             'success': True,
-            'categories': formatted_categories
+            'categories': categories_object
         })
 
     @app.route('/questions')
@@ -59,13 +60,13 @@ def create_app(test_config=None):
         current_questions = paginate_items(request, questions)
 
         categories = Category.query.order_by(Category.id).all()
-        formatted_categories = [category.format() for category in categories]
+        formatted_categories = {category.id: category.type for category in categories}
 
         return jsonify({
             'success': True,
+            'categories': formatted_categories,
             'questions': current_questions,
-            'total_questions': len(questions),
-            'categories': formatted_categories
+            'total_questions': len(questions)
         })
 
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
@@ -78,8 +79,8 @@ def create_app(test_config=None):
         """
         try:
             # Get specific question by ID
-            question = Question.query.filter(
-                Question.id == question_id).one_or_none()
+            question = Question.query.filter_by(
+                id == question_id).one_or_none()
 
             # Abort if question doesn't exist
             if question is None:
@@ -179,16 +180,14 @@ def create_app(test_config=None):
         categories in the left column will cause only questions of that
         category to be shown.
         """
-        selected_category = Category.query.filter(
-            Category.id == category_id).one_or_none()
+        selected_category = Category.query.filter_by(id == category_id).one_or_none()
 
         # Abort if category doesn't exist
         if selected_category is None:
             abort(404)
 
         # Get questions by category
-        categorized_questions = Question.query.filter(
-            Question.category == category_id).all()
+        categorized_questions = Question.query.filter(Question.category == category_id).all()
 
         # paginate questions
         paginated_questions = paginate_items(request, categorized_questions)
@@ -201,7 +200,7 @@ def create_app(test_config=None):
         })
 
     @app.route('/quizzes', methods=['POST'])
-    def get_random_questions(quiz_category, previous_qns):
+    def get_random_questions():
         """
         Handles request to get randomized questions to play the quiz.
 
@@ -213,10 +212,10 @@ def create_app(test_config=None):
             body = request.get_json()
 
             # Get previous questions
-            previous_questions = body.get(previous_qns)
+            previous_questions = body.get('previous_questions')
 
             # Get category
-            category = body.get(quiz_category)
+            category = body.get('quiz_category')
 
 
             # Abort if category or previous questions don't exist
@@ -239,7 +238,7 @@ def create_app(test_config=None):
         
             # Check if question was already asked
             # If it was, get new question
-            while next_random_question.id not in previous_qns:
+            while next_random_question.id not in previous_questions:
                 next_random_question = questions[random_number]
 
                 return jsonify({
