@@ -15,9 +15,6 @@ def create_app(test_config=None):
     CORS(app)
 
     # CORS Headers
-    """
-    @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-    """
     @app.after_request
     def after_request(response):
         """
