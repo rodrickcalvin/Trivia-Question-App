@@ -29,11 +29,14 @@ def create_app(test_config=None):
     @app.route('/categories')
     def get_categories():
         """
-        '/categories' handles GET requests for all available trivia question categories.
+        '/categories' handles GET requests for all
+        available trivia question categories.
         """
         categories = Category.query.order_by(Category.id).all()
-        categories_object = {category.id: category.type for category in categories}
-        
+        categories_object = {
+            category.id: category.type for category in categories
+            }
+
         return jsonify({
             'success': True,
             'categories': categories_object
@@ -54,7 +57,9 @@ def create_app(test_config=None):
         current_questions = paginate_items(request, questions)
 
         categories = Category.query.order_by(Category.id).all()
-        formatted_categories = {category.id: category.type for category in categories}
+        formatted_categories = {
+            category.id: category.type for category in categories
+        }
 
         return jsonify({
             'success': True,
@@ -95,12 +100,13 @@ def create_app(test_config=None):
     def create_question():
         """
         Handles POST requests:
-        - creation of a new question which will require 
+        - creation of a new question which will require
         the question and answer text, category, and difficulty score.
         - get questions by search term that is a substring.
 
-        @TESTS: Create Question:- test_create_new_question, test_422_if_question_creation_fails.
-
+        @TESTS:Create Question:
+            -test_create_new_question,
+            -test_422_if_question_creation_fails.
         @TESTS: Search:- test_search_questions, test_404_for_no_results.
         """
         try:
@@ -116,8 +122,10 @@ def create_app(test_config=None):
 
                 # if no questions found abort
                 if len(filtered_questions) == 0:
-                    abort(
-                        Response('No questions found for {}'.format(search_term), 404))
+                    abort(Response(
+                        'No questions found for {}'.format(search_term), 404
+                        )
+                    )
 
                 # paginate filtered questions
                 paginated_results = paginate_items(request, filtered_questions)
@@ -137,12 +145,19 @@ def create_app(test_config=None):
                 new_category = body.get('category')
 
                 # Abort if question, answer, category or difficulty are missing
-                if new_question is None or new_answer is None or new_category is None or new_difficulty is None:
+                if (
+                    new_question is None or
+                    new_answer is None or
+                    new_category is None or
+                    new_difficulty is None
+                ):
                     abort(422)
 
                 # create instance of Question model
                 question = Question(question=new_question, answer=new_answer,
-                                    difficulty=new_difficulty, category=new_category)
+                                    difficulty=new_difficulty,
+                                    category=new_category
+                                    )
                 question.insert()
 
                 # Return new question with all other questions
@@ -164,16 +179,20 @@ def create_app(test_config=None):
         """
         Gets questions based on category.
 
-        @TESTS: test_get_questions_by_category, test_404_if_categorized_questions_fail
+        @TESTS:
+        - test_get_questions_by_category,
+        - test_404_if_categorized_questions_fail
         """
 
         # Abort if category doesn't exist
-        selected_category = Category.query.filter(Category.id == category_id).one_or_none()
+        selected_category = Category.query.filter(
+            Category.id == category_id).one_or_none()
         if selected_category is None:
             abort(404)
 
         # Get questions by category
-        categorized_questions = Question.query.filter(Question.category == category_id).all()
+        categorized_questions = Question.query.filter(
+            Question.category == category_id).all()
 
         # paginate questions
         paginated_questions = paginate_items(request, categorized_questions)
@@ -200,41 +219,36 @@ def create_app(test_config=None):
 
             # Get category
             category = body.get('quiz_category')
-
-
             # Abort if category or previous questions don't exist
             if category is None or previous_questions is None:
                 abort(400)
 
-            # Get questions by category and return all questions if no/all category is selected
+            # Get questions by category
+            # return all questions if no/all category is selected
             if category['id'] == 0:
                 # Check if question was already asked
                 # If it was, get new question
-                questions = Question.query.filter(Question.id.not_in(previous_questions)).all()
+                questions = Question.query.filter(
+                    Question.id.not_in(previous_questions)).all()
             else:
                 # Check if question was already asked
                 # If it was, get new question
-                questions = Question.query.filter(Question.id.not_in(previous_questions),
+                questions = Question.query.filter(
+                    Question.id.not_in(previous_questions),
                     Question.category == category['id']).all()
 
-        
-            # Get random question 
+            # Get random question
             next_random_question = random.choice(questions)
-                    
+
             return jsonify({
                 'success': True,
-                'question': next_random_question.format(),                   
+                'question': next_random_question.format(),
             })
 
         except:
             abort(422)
 
-
-
-
-
-
-    # Error handlers for all expected errors========================================
+    # Error handlers for all expected errors==================================
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
