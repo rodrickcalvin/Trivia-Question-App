@@ -15,9 +15,17 @@ class TriviaTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = "trivia_test"
-        self.database_path = "postgres://{}:{}@{}/{}".format(
+        self.database_path = "postgresql://{}:{}@{}/{}".format(
             'student', 'student', 'localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
+
+        # sample for a create new question
+        self.new_question = {
+            'question': 'What does the term "ruminant" mean?',
+            'answer': 'An animal with a four-chambered stomach and two-toed feet',
+            'difficulty': 5,
+            'category': '1'
+        }
 
         # binds the app to the current context
         with self.app.app_context():
@@ -29,6 +37,23 @@ class TriviaTestCase(unittest.TestCase):
     def tearDown(self):
         """Executed after reach test"""
         pass
+
+    def test_get_categories(self):
+        """Tests category retrieval success"""
+
+        # get response and load data
+        response = self.client().get('/categories')
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+        # check that categories return data
+        self.assertTrue(data['categories'])
+
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # TESTING QUESTION FETCHING=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     def test_get_paginated_questions(self):
         """Tests question pagination success"""
@@ -101,6 +126,26 @@ class TriviaTestCase(unittest.TestCase):
         # check if question equals None after delete
         self.assertEqual(question, None)
 
+    def test_404_if_question_deletion_fails(self):
+        """Tests question deletion failure 422"""
+
+        # get number of questions before delete
+        questions_before = Question.query.all()
+
+        # delete question with bad id, then load response data
+        response = self.client().delete('/questions/5555')
+        data = json.loads(response.data)
+
+        # get number of questions after delete
+        questions_after = Question.query.all()
+
+        # check status code and success message
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+
+        # check if questions_after and questions_before are equal
+        self.assertTrue(len(questions_after) == len(questions_before))
+
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     # TESTING QUESTION CREATION=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -168,10 +213,10 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
 
         # check that number of results = 1
-        self.assertEqual(len(data['questions']), 1)
+        self.assertEqual(len(data['questions']), 7)
 
         # check that id of question in response is correct
-        self.assertEqual(data['questions'][0]['id'], 23)
+        self.assertEqual(data['questions'][0]['id'], 10)
 
     def test_404_for_no_results(self):
         """Tests search for 404 when there are no results"""
@@ -184,9 +229,9 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         # check response status code and message
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'No questions found for Bweyogerere')
+        self.assertEqual(data['message'], 'unprocessable')
 
     # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     # TESTING GET QUESTIONS BY SPECIFIC CATEGORY-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -254,7 +299,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertNotEqual(data['question']['id'], 17)
 
     def test_play_quiz_fails(self):
-        """Tests playing quiz game failure 400"""
+        """Tests playing quiz game failure 422"""
 
         # send post request without json data
         response = self.client().post('/quizzes', json={})
@@ -263,9 +308,9 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         # check response status code and message
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'bad request')
+        self.assertEqual(data['message'], 'unprocessable')
 
 
 # Make the tests conveniently executable

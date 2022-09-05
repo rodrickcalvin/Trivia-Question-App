@@ -56,6 +56,9 @@ def create_app(test_config=None):
         # Paginated questions
         current_questions = paginate_items(request, questions)
 
+        if len(current_questions) == 0:
+            abort(404)
+
         categories = Category.query.order_by(Category.id).all()
         formatted_categories = {
             category.id: category.type for category in categories
@@ -77,8 +80,8 @@ def create_app(test_config=None):
         """
         try:
             # Get specific question by ID
-            question = Question.query.filter_by(
-                id == question_id).one_or_none()
+            question = Question.query.filter(
+                Question.id == question_id).one_or_none()
 
             # Abort if question doesn't exist
             if question is None:
