@@ -1,4 +1,4 @@
-import os
+from os import environ
 import unittest
 import json
 from flask_sqlalchemy import SQLAlchemy
@@ -14,9 +14,13 @@ class TriviaTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "trivia_test"
+        self.database_name = environ['TEST_DB_NAME']
         self.database_path = "postgresql://{}:{}@{}/{}".format(
-            'student', 'student', 'localhost:5432', self.database_name)
+            environ['DB_USER'],
+            environ['DB_PASSWORD'],
+            environ['DB_HOST'],
+            self.database_name
+        )
         setup_db(self.app, self.database_path)
 
         # sample for a create new question
