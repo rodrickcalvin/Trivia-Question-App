@@ -167,8 +167,7 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-    app.route('/categories/<int:category_id>/questions')
-
+    @app.route('/categories/<int:category_id>/questions')
     def get_questions_by_category(category_id):
         """
         Gets questions based on category.
@@ -177,9 +176,9 @@ def create_app(test_config=None):
         categories in the left column will cause only questions of that
         category to be shown.
         """
-        selected_category = Category.query.filter_by(id == category_id).one_or_none()
 
         # Abort if category doesn't exist
+        selected_category = Category.query.filter(Category.id == category_id).one_or_none()
         if selected_category is None:
             abort(404)
 
@@ -219,36 +218,25 @@ def create_app(test_config=None):
             if category is None or previous_questions is None:
                 abort(400)
 
-            # Get questions by category and return all questions if no category is selected
+            # Get questions by category and return all questions if no/all category is selected
             if category['id'] == 0:
-                questions = Question.query.order_by(Question.id).all()
+                # Check if question was already asked
+                # If it was, get new question
+                questions = Question.query.filter(Question.id.not_in(previous_questions)).all()
             else:
-                questions = Question.query.filter(
+                # Check if question was already asked
+                # If it was, get new question
+                questions = Question.query.filter(Question.id.not_in(previous_questions),
                     Question.category == category['id']).all()
 
-            
-            # Get random number
-            random_number = random.randint(0, len(questions) - 1)
-
-            # Get random question 
-            next_random_question = questions[random_number]
         
-            # Check if question was already asked
-            # If it was, get new question
-            while next_random_question.id not in previous_questions:
-                next_random_question = questions[random_number]
-
-                return jsonify({
-                    'success': True,
-                    'question': {
-                        'id': next_random_question.id,
-                        'question': next_random_question.question,
-                        'category': next_random_question.category,
-                        'difficulty': next_random_question.difficulty,
-                        'answer': next_random_question.answer
-                    },
-                    'previous_questions': previous_questions
-                })
+            # Get random question 
+            next_random_question = random.choice(questions)
+                    
+            return jsonify({
+                'success': True,
+                'question': next_random_question.format(),                   
+            })
 
         except:
             abort(422)
