@@ -25,7 +25,7 @@ class TriviaTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
-    
+
     def tearDown(self):
         """Executed after reach test"""
         pass
@@ -58,15 +58,18 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
 
-    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    # TESTING QUESTION DELETION=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # TESTING QUESTION DELETION=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
     def test_delete_question(self):
         """Tests question deletion success"""
 
         # create a new question to be deleted
-        question = Question(question=self.new_question['question'], answer=self.new_question['answer'],
-                            category=self.new_question['category'], difficulty=self.new_question['difficulty'])
+        question = Question(
+            question=self.new_question['question'],
+            answer=self.new_question['answer'],
+            category=self.new_question['category'],
+            difficulty=self.new_question['difficulty'])
         question.insert()
 
         # get the id of the new question
@@ -98,8 +101,8 @@ class TriviaTestCase(unittest.TestCase):
         # check if question equals None after delete
         self.assertEqual(question, None)
 
-    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    # TESTING QUESTION CREATION=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # TESTING QUESTION CREATION=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     def test_create_new_question(self):
         """Tests question creation success"""
@@ -147,8 +150,8 @@ class TriviaTestCase(unittest.TestCase):
         # check if questions_after and questions_before are equal
         self.assertTrue(len(questions_after) == len(questions_before))
 
-    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    # TESTING SEARCH FEATURE-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # TESTING SEARCH FEATURE-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     def test_search_questions(self):
         """Tests search questions success"""
@@ -185,8 +188,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'No questions found for Bweyogerere')
 
-    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    # TESTING GET QUESTIONS BY SPECIFIC CATEGORY-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # TESTING GET QUESTIONS BY SPECIFIC CATEGORY-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     def test_get_questions_by_category(self):
         """Tests getting questions by category success"""
@@ -221,17 +224,17 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
 
-    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    # TESTING GET RANDOM QUESTIONS FOR THE QUIZ=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    # CHECK IF QUESTIONS ARE UNIQUE=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # TESTING GET RANDOM QUESTIONS FOR THE QUIZ=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # CHECK IF QUESTIONS ARE UNIQUE=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     def test_play_quiz(self):
         """Tests playing quiz game success"""
 
         # send post request with category and previous questions
-        response = self.client().post('/quizzes',
-                                      json={'previous_questions': [16, 17],
-                                            'quiz_category': {'type': 'Geography', 'id': '3'}})
+        response = self.client().post('/quizzes', json={
+            'previous_questions': [16, 17],
+            'quiz_category': {'type': 'Geography', 'id': '3'}})
 
         # load response data
         data = json.loads(response.data)
@@ -263,7 +266,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'bad request')
-
 
 
 # Make the tests conveniently executable
