@@ -33,6 +33,7 @@ class FormView extends Component {
     event.preventDefault();
     $.ajax({
       url: '/questions',
+      type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
       data: JSON.stringify({
