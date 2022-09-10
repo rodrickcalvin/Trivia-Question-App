@@ -241,15 +241,22 @@ def create_app(test_config=None):
                     Question.category == category['id']).all()
 
             # Get random question
-            next_random_question = random.choice(questions)
+            if questions:
+                next_random_question = random.choice(questions)
+            else:
+                return jsonify({
+                    'success': True,
+                })
 
             return jsonify({
                 'success': True,
                 'question': next_random_question.format(),
             })
 
-        except:
+        except Exception as e:
+            print(e)
             abort(422)
+
 
     # Error handlers for all expected errors==================================
     @app.errorhandler(404)
